@@ -3,6 +3,7 @@
 
 #include <test.h>
 #include <tempCal.h>
+#include <loopct.h>	//
 int main(int argc,char *argv[])
 {
 	double tempretureVal;
@@ -35,6 +36,8 @@ int main(int argc,char *argv[])
 		}else if(!strcmp(argv[1],"tempcal")){
 			tempretureVal = tempCaculate();
 			printf("temp=%lf\r\n",tempretureVal);
+		}else if(!strcmp(argv[1],"loopct")){	//温度回环控制
+			loopControl();
 		}else{
 			cout << " err io files "<<endl;
 		}

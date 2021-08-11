@@ -147,7 +147,6 @@ double tempCaculate()
 	vector<uint8_t>().swap(readBuff);	//清空
 	oneWireByteWrite(0xCC);
 	oneWireByteWrite(0x44);
-	delayMicroseconds(100);
 	while(digitalRead(TEMP_PIN)==LOW);
 
 
@@ -163,6 +162,7 @@ double tempCaculate()
 	crcval = CRC8_Table(readBuff,8);
 	if(crcval!=readBuff[8]){
 		printf("err temp crc\r\n");
+		return -1;
 	}
 	tempVal = ((double)readBuff[0]+(double)(readBuff[1]<<8)) * 0.0625;
 	return tempVal;
