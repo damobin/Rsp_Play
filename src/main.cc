@@ -1,9 +1,11 @@
 #include <public.h>
 #include <tool.h>
-
+#include <opencv2/opencv.hpp>
 #include <test.h>
 #include <tempCal.h>
 #include <loopct.h>	//
+#include <capImgs.h>
+using namespace cv;
 int main(int argc,char *argv[])
 {
 	double tempretureVal;
@@ -11,10 +13,13 @@ int main(int argc,char *argv[])
 	cout<<exec("pwd")<<endl;
 	if(argc<2){
 		printf("less args\r\n");
-		printf("para as : ./run.sh \"-s\" \"../data/outfile.bin\"\r\n");
-		printf("para as : ./run.sh \"-r\" \"../data/outfile.bin\"\r\n");
-		printf("para as : ./run.sh \"rest\" \" \"\r\n");
-		printf("para as : ./run.sh \"tempcal\" \" \"\r\n");
+		printf("para as ./run.sh \"-r\" \"../data/xxx.bin\"\r\n");
+		printf("para as ./run.sh \"-s\" \"../data/xxx.bin\"\r\n");
+		printf("para as rest\r\n");
+		printf("para as tempcal\r\n");
+		printf("para as loopct\r\n");
+		printf("para as imags\r\n");
+		printf("para as imags \"imgPath\"\r\n");
 //#define DEBUG
 #ifndef DEBUG
 //		test("../data/open.txt","../data/open.txt");
@@ -38,8 +43,31 @@ int main(int argc,char *argv[])
 			printf("temp=%lf\r\n",tempretureVal);
 		}else if(!strcmp(argv[1],"loopct")){	//温度回环控制
 			loopControl();
+		}else if(!strcmp(argv[1],"imags")){	//温度回环控制
+			openVideo();
+			Mat imags = capImags();
+			if(imags.cols<=0 || imags.rows<=0){
+				return -1;
+			}
+			if(strlen(argv[2])){
+				string imagsPath(argv[2]);
+				printf("imgPath = %s\r\n",argv[2]);
+				imwrite(imagsPath,imags);
+			}else{
+				imwrite("../imags/img1.jpg",imags);
+			}
+			closeVideo();
+		}else if(!strcmp(argv[1],"video")){	//温度回环控制
+			videoCat();
 		}else{
-			cout << " err io files "<<endl;
+			printf("err main para :argv[1]=%s argv[2]=%s\r\n",argv[1],argv[2]);
+			printf("para as ./run.sh \"-r\" \"../data/xxx.bin\"\r\n");
+			printf("para as ./run.sh \"-s\" \"../data/xxx.bin\"\r\n");
+			printf("para as rest\r\n");
+			printf("para as tempcal\r\n");
+			printf("para as loopct\r\n");
+			printf("para as imags\r\n");
+			printf("para as imags \"imgPath\"\r\n");
 		}
 	}
 	return 0;

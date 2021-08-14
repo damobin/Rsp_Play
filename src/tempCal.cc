@@ -158,9 +158,9 @@ double tempCaculate()
 	oneWireByteWrite(0xBE);
 	//oneWireByteWrite(0xCC);
 	oneWireRead(readBuff,9);
-	PRINTSTRDATA(readBuff,9,16);
 	crcval = CRC8_Table(readBuff,8);
 	if(crcval!=readBuff[8]){
+		PRINTSTRDATA(readBuff,9,16);
 		printf("err temp crc\r\n");
 		return -1;
 	}

@@ -19,7 +19,7 @@ extern "C"{
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <wiringPi.h>
 
 #ifdef __cplusplus
 }

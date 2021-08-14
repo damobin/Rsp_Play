@@ -1,5 +1,4 @@
 #include "test.h"
-#include "wiringPi.h"
 #define OVERTIME_SECOND_NUM  15	//最大超时时间
 #define LOADWAVELEVEL	0.35	//占空比
 #define LOADFREQ 38000		//载波频率

@@ -19,7 +19,7 @@ if [ $? -ne 0 ]
 			then		
 				cd ./bin
 				du -h *
-				./* "$*"
+				./* $*
 				cd ..
 			else
 				cd ./bin
