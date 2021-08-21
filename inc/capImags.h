@@ -29,6 +29,7 @@ Mat capImags(void);
 void videoCat(void);
 void FixImags(Mat inMat,Mat &outMat,int val);
 int JudgeAct(Mat PreMat,Mat AftMat,Mat &outMat);
+static void concatData(string &out,struct tm *usertimes,int times);
 void *ActJdLoop(void *arg);
 
 #endif

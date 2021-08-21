@@ -63,6 +63,13 @@ systemget systemcheck()
 	}
 	return no_os_flag;
 }
+//获取当前当地系统时间
+time_t timep;
+void localTimeExc(struct tm **usertimes)
+{
+	time(&timep);
+	*usertimes = localtime(&timep);
+}
 
 //字符串转数组工具函数 
 static int ExcStrToBytes(uint8_t *obj,uint8_t *src)

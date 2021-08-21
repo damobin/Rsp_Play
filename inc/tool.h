@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <time.h>
 #include <opencv2/opencv.hpp>
 using namespace std;
 using namespace cv;
@@ -23,5 +24,6 @@ systemget systemcheck();
 std::string exec(const char* cmd);
 static int ExcStrToBytes(uint8_t *Obj,uint8_t *Src);            //字符串转数组
 bool matIsEqual(Mat mat1,Mat mat2);
+void localTimeExc(struct tm **usertimes);
 
 #endif

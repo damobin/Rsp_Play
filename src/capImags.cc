@@ -58,12 +58,26 @@ int JudegeAct(Mat PreMat,Mat AftMat,Mat &outMat)
 	
 	return ActJd;
 }
-
+static void concatData(string &out,struct tm *usertimes,int times)
+{
+	char dataTp[100];
+	memset(dataTp,'\0',100);
+	sprintf(dataTp,"_20%2d-%02d-%02d-%02d-%02d-%02d--%d",
+					usertimes->tm_year%100,\
+					usertimes->tm_mon+1,\
+					usertimes->tm_mday,\
+					usertimes->tm_hour,\
+					usertimes->tm_min,\
+					usertimes->tm_sec,\
+					times);
+	out.assign(dataTp,strlen(dataTp));
+}
 void *ActJdLoop(void *arg)
 {
 	int times=0;
 	int judVal;
-	string NamePre,NameCur,NameTemp="T";
+	struct tm *usertimes;
+	string Namesave;
 	Mat PreMat,CurMat,TempMat;
 	openVideo();
 	PreMat = capImags();
@@ -72,6 +86,7 @@ void *ActJdLoop(void *arg)
 		CurMat = capImags();
 		times++;
 		judVal = JudegeAct(PreMat,CurMat,TempMat);	//判断图片是否变形
+		localTimeExc(&usertimes);
 		if(judVal == HUMAN){
 			cap_printf("times=%d judVal = HUMAN\r\n",times);
 		}else if(judVal == LIGHT_OFF ){
@@ -79,6 +94,9 @@ void *ActJdLoop(void *arg)
 		}else if(judVal == LIGHT_ON ){
 			cap_printf("times=%d judVal = LIGHT_ON\r\n",times);
 		}else{
+			concatData(Namesave,usertimes,times);
+			cout<<Namesave<<endl;
+			cap_printf("times=%d judVal = NOTHING\r\n",times);
 		}
 		CurMat.copyTo(PreMat);
 	}while(1);

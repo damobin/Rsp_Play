@@ -29,10 +29,16 @@ void *loopControl(void* arg)
 	//获取当地经纬度  判断这个区域的温度
 	bool   action=0;
 	double tempDS18B20;
+#if	0
 	time_t timep;
 	struct tm *usertimes;
 	time (&timep);
 	usertimes = localtime(&timep);
+#else
+	struct tm *usertimes;
+	localTimeExc(&usertimes);
+#endif
+	
 	loop_printf("usertimes.min = %d\r\n",usertimes->tm_min);
 	loop_printf("usertimes.hour = %d\r\n",usertimes->tm_hour);
 	loop_printf("usertimes.day = %d\r\n",usertimes->tm_mday);
@@ -42,9 +48,12 @@ void *loopControl(void* arg)
 	loop_printf("%s",asctime(usertimes));
 	cout<<exec("pwd")<<endl;
 	while(1){
+#if	0
 		time (&timep);
-		//usertimes = gmtime(&timep);
 		usertimes = localtime(&timep);
+#else
+		localTimeExc(&usertimes);
+#endif
 		if(usertimes->tm_wday<5){	//周末我要睡懒觉  不关空调
 			if(usertimes->tm_hour>7 && usertimes->tm_hour<18){//早上七点后 下午6点前 关空调
 				MulOpenTimes("../data/close.bin",REPET_TIMES);
