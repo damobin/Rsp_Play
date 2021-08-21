@@ -22,7 +22,7 @@
 }while(0);
 #endif
 
-void loopControl(void);
-
+void *loopControl(void* arg);
+void MulThreadCnt(void);
 
 #endif

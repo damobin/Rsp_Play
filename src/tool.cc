@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <tool.h>
 //user head file
 //user macro 
 #ifndef _WIN32
@@ -20,19 +21,7 @@
 
 #endif
 int a,b,c;
-
-enum systemget{
-	linux_os 	= 0,
-	unix_os 	= 1,
-	windows_os 	= 2,
-	win32_os 	= 3,
-	UNDEFINE_OS = 0xff,
-};
 using namespace std;
-//<<funs declear
-systemget systemcheck();
-std::string exec(const char* cmd);
-static int ExcStrToBytes(uint8_t *Obj,uint8_t *Src);		//字符串转数组
 
 std::string exec(const char* cmd) {
     FILE* pipe = popen(cmd, "r");
@@ -88,4 +77,23 @@ static int ExcStrToBytes(uint8_t *obj,uint8_t *src)
 		obj[i]=tempb;		
 	}
 	return lens;
+}
+
+bool matIsEqual(Mat mat1,Mat mat2) {
+	if (mat1.empty() && mat2.empty()) {
+		return true;
+	}
+	if (mat1.cols != mat2.cols || mat1.rows != mat2.rows || mat1.dims != mat2.dims||
+		mat1.channels()!=mat2.channels()) {
+		return false;
+	}
+	if (mat1.size() != mat2.size() \
+	 || mat1.channels() != mat2.channels() \
+	 || mat1.type() != mat2.type()) {
+		return false;
+	}
+	int nrOfElements1 = mat1.total()*mat1.elemSize();
+	if (nrOfElements1 != mat2.total()*mat2.elemSize()) return false;
+	bool lvRet = memcmp(mat1.data, mat2.data, nrOfElements1) == 0;
+	return lvRet;
 }

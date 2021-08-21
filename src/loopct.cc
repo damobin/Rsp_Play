@@ -2,6 +2,9 @@
 #include "unistd.h"
 #include "string"
 #include "fstream"
+#include "capImags.h"
+#include <pthread.h>
+#include <csignal>
 #define REPET_TIMES	7
 static void MulOpenTimes(string fileName,int times);	//多用重复多次开空调  因为树莓派离空调有三米远,有的时候开两次成功一次    目前成功率在60%以上 缩短距离可以提高    离空调半米近98的成功率
 static void LogTimeWriteFile(string ofname,struct tm *strtm,string dummy,double tempDS18B20);	//如果出现调控写个log
@@ -19,7 +22,7 @@ enum selfMon{
 	NOV = 10,
 	DEC = 11
 };
-void loopControl()
+void *loopControl(void* arg)
 {
 	//获取现在时间    年--月--日
 	//判断现在的季节  春 - 夏 - 秋 - 冬
@@ -51,7 +54,7 @@ void loopControl()
 				loop_printf("usertimes.mon = %d\r\n",usertimes->tm_mon);
 				loop_printf("usertimes.year = %d\r\n",usertimes->tm_year);
 				loop_printf("usertimes.wday = %d\r\n",usertimes->tm_wday);
-				return ;
+				return NULL;
 			}
 		}
 		tempDS18B20 = tempCaculate();	//获取温度  让温度处于 29~32区间
@@ -96,6 +99,7 @@ void loopControl()
 			action ^= 1;
 		}
 	}
+	return NULL;
 }
 
 static void MulOpenTimes(string fileName,int times)
@@ -121,3 +125,31 @@ static void LogTimeWriteFile(string ofname,struct tm *strtm,string dummy,double 
 	ofs<<endl;
 	ofs.close();
 }
+static volatile int keepRunning = 1; 
+void sig_handler( int sig )
+{
+    if ( sig == SIGINT){
+        keepRunning = 0;
+		exit(0);
+    }
+}
+
+void MulThreadCnt()
+{
+	void *threadret;
+	signal( SIGINT, sig_handler );
+	pthread_t tempretureThread,ImagThread;
+	pthread_create(&tempretureThread,NULL,loopControl,NULL);
+	pthread_create(&ImagThread,NULL,ActJdLoop,NULL);
+	pthread_join(tempretureThread,&threadret);
+	//pthread_detach(tempretureThread);
+#if	1
+	pthread_join(ImagThread,NULL);
+#else
+	pthread_detach(ImagThread);
+	while( keepRunning ){
+		sleep(10);
+	}
+#endif
+}
+

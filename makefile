@@ -8,7 +8,7 @@ TARGET = wiringPi_T1
 OUTDIR = ./bin
 
 #<< flags -w去除警告   -Wall 添加警告
-CFLAGS = -g -std=c++11 -w 
+CFLAGS = -g -w -std=c++11
 
 #FILE DISK
 
@@ -18,7 +18,7 @@ CFLAGS = -g -std=c++11 -w
 INCS = -I ./inc
 #<< link
 LINK  = 
-LINK += -lwiringPi
+LINK += -lwiringPi -lpthread
 
 
 
