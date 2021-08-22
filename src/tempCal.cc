@@ -78,6 +78,7 @@ void oneWireWrite(vector<uint8_t> writeBuff)
 		oneWireByteWrite(writeBuff[i]);
 	}
 }
+#define ROM_ID "28 95 58 48 3A 20 01 38"
 uint8_t oneWireByteRead()
 {
 	uint8_t readBuff;
@@ -87,14 +88,14 @@ uint8_t oneWireByteRead()
 		//digitalWrite(TEMP_PIN,HIGH);
 
 		pinMode(TEMP_PIN,INPUT);
-		delayMicroseconds(14);
+		delayMicroseconds(2);
 		readBuff >>= 1;
 		if(digitalRead(TEMP_PIN)==LOW){
 			readBuff &= 0x7f;
 		}else{
 			readBuff |= 0x80;
 		}
-		delayMicroseconds(40);
+		delayMicroseconds(52);
 		digitalWrite(TEMP_PIN,HIGH);
 		pinMode(TEMP_PIN,OUTPUT);
 		delayMicroseconds(5);
@@ -162,6 +163,7 @@ double tempCaculate()
 	if(crcval!=readBuff[8]){
 		PRINTSTRDATA(readBuff,9,16);
 		printf("err temp crc\r\n");
+		printf("crcval=%x\r\n",crcval);
 		return -1;
 	}
 	tempVal = ((double)readBuff[0]+(double)(readBuff[1]<<8)) * 0.0625;

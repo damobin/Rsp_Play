@@ -10,6 +10,10 @@
 #define LIGHT_OFF 	0x02
 #define LIGHT_ON  	0x03
 
+#define P_WIDTH		640
+#define P_HEIGHT	480
+
+
 #define CAP_DEBUG	3
 
 #ifdef  CAP_DEBUG

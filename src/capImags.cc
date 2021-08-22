@@ -66,6 +66,11 @@ void FixImags(Mat inMat,Mat &outMat,int val)
 	cvtColor(inMat, Mattemp, CV_BGR2GRAY);
 	threshold(Mattemp, Mattemp, val, 255.0, CV_THRESH_BINARY);	//大于进行二值化a
 	medianBlur(Mattemp,Mattemp,5);		//中值滤波 滤波矩形为 5*5
+    Mat element = getStructuringElement(MORPH_RECT, Size(3, 3));		//腐蚀矩阵
+    Mat element2 = getStructuringElement(MORPH_RECT, Size(50, 50));		//膨胀矩阵
+    erode(Mattemp, Mattemp, element);	//腐蚀
+    //dilate(Mattemp, Mattemp, element2);	//膨胀
+
 	Mattemp.copyTo(outMat);
 }
 
@@ -81,12 +86,16 @@ int JudegeAct(Mat PreMat,Mat AftMat,Mat &outMat)
 		cout<<"NULL AftMat"<<endl;
 		return ActJd;
 	}
+	//flip(PreMat,PreMat,-1);	//摄像头原因旋转180
+	flip(AftMat,AftMat,-1);
 	Mat PMat,AMat;
-	int TheVal = 10;
+	int TheVal = 4;
 	FixImags(PreMat,PMat,TheVal);	
 	FixImags(AftMat,AMat,TheVal);
 #if CAP_DEBUG == 3
+	imwrite("../imags/PSrcMat.jpg",PreMat);
 	imwrite("../imags/PMat.jpg",PMat);
+	imwrite("../imags/ASrcMat.jpg",AftMat);
 	imwrite("../imags/AMat.jpg",AMat);
 #endif
 	//判断黑夜还是白天
