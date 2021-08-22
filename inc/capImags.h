@@ -10,7 +10,7 @@
 #define LIGHT_OFF 	0x02
 #define LIGHT_ON  	0x03
 
-#define CAP_DEBUG
+#define CAP_DEBUG	3
 
 #ifdef  CAP_DEBUG
 #define cap_printf(format,...)  do{    \

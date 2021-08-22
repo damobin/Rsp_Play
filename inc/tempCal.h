@@ -28,5 +28,7 @@ void oneWireByteWrite(uint8_t byteBuff);
 void oneWireWrite(vector<uint8_t> writeBuff);
 uint8_t oneWireByteRead();
 void oneWireRead(vector<uint8_t> &readBuff,uint8_t readLen);
-double tempCaculate();
+double tempCaculate();	//单次温度获取
+double AveTempGet(int times);	//times次温度获取
+double AveTempGet();	//times次温度获取
 #endif

@@ -167,4 +167,49 @@ double tempCaculate()
 	tempVal = ((double)readBuff[0]+(double)(readBuff[1]<<8)) * 0.0625;
 	return tempVal;
 }
+double AveTempGet(int times)
+{
+	int Aindex=0;
+	double AveTemp;
+	double sumTemp=0,singleTemp;
+	if(times<=0){
+		times = 5;
+	}
+AveTempGetAgain:
+	for(int i=0;i<times;i++){//总计 5 次  耗时 约 (480 us +  1000 us )* 5 = 1480*5 = 15*5 ms
+		singleTemp = tempCaculate(); // 75 ms
+		if(singleTemp<=0 || singleTemp>=80){
+			continue;
+		}else{
+			sumTemp +=singleTemp;
+			Aindex++;
+		}
+	}
+	if(Aindex==0){
+		goto AveTempGetAgain;
+	}
+	AveTemp = sumTemp / Aindex;
+	return AveTemp;
+}
 
+double AveTempGet()
+{
+	int Aindex=0;
+	double AveTemp;
+	double sumTemp=0,singleTemp;
+AveTempGetAgain_T:
+	for(int i=0;i<5;i++){//总计 5 次  耗时 约 (480 us +  1000 us )* 5 = 1480*5 = 15*5 ms
+		singleTemp = tempCaculate(); // 75 ms
+		if(singleTemp<=0 || singleTemp>=80){
+			continue;
+		}else{
+			sumTemp +=singleTemp;
+			Aindex++;
+		}
+	}
+	if(Aindex==0){
+		goto AveTempGetAgain_T;
+	}
+	AveTemp = sumTemp / Aindex;
+	return AveTemp;
+}

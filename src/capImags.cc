@@ -44,25 +44,12 @@ Mat capImags()
 }
 
 
-void FixImags(Mat inMat,Mat &outMat,int val)
-{
-	Mat Mattemp;
-	cvtColor(inMat, Mattemp, CV_BGR2GRAY);
-	threshold(Mattemp, Mattemp, val, 255.0, CV_THRESH_BINARY);	//大于进行二值化
-	Mattemp.copyTo(outMat);
-}
 
-int JudegeAct(Mat PreMat,Mat AftMat,Mat &outMat)
-{
-	int ActJd=NOTHING;
-	
-	return ActJd;
-}
 static void concatData(string &out,struct tm *usertimes,int times)
 {
 	char dataTp[100];
 	memset(dataTp,'\0',100);
-	sprintf(dataTp,"_20%2d-%02d-%02d-%02d-%02d-%02d--%d",
+	sprintf(dataTp,"_20%2d-%02d-%02d-%02d-%02d-%02d--%d.jpg",
 					usertimes->tm_year%100,\
 					usertimes->tm_mon+1,\
 					usertimes->tm_mday,\
@@ -72,6 +59,42 @@ static void concatData(string &out,struct tm *usertimes,int times)
 					times);
 	out.assign(dataTp,strlen(dataTp));
 }
+
+void FixImags(Mat inMat,Mat &outMat,int val)
+{
+	Mat Mattemp;
+	cvtColor(inMat, Mattemp, CV_BGR2GRAY);
+	threshold(Mattemp, Mattemp, val, 255.0, CV_THRESH_BINARY);	//大于进行二值化a
+	medianBlur(Mattemp,Mattemp,5);		//中值滤波 滤波矩形为 5*5
+	Mattemp.copyTo(outMat);
+}
+
+int JudegeAct(Mat PreMat,Mat AftMat,Mat &outMat)
+{
+	int ActJd=NOTHING;
+	if(PreMat.cols<=0 || PreMat.rows<=0 || PreMat.data==NULL){
+		cout<<"NULL PreMat"<<endl;
+		return ActJd;
+	}
+
+	if(AftMat.cols<=0 || AftMat.rows<=0 || AftMat.data==NULL){
+		cout<<"NULL AftMat"<<endl;
+		return ActJd;
+	}
+	Mat PMat,AMat;
+	int TheVal = 10;
+	FixImags(PreMat,PMat,TheVal);	
+	FixImags(AftMat,AMat,TheVal);
+#if CAP_DEBUG == 3
+	imwrite("../imags/PMat.jpg",PMat);
+	imwrite("../imags/AMat.jpg",AMat);
+#endif
+	//判断黑夜还是白天
+	
+
+	return ActJd;
+}
+
 void *ActJdLoop(void *arg)
 {
 	int times=0;
@@ -86,16 +109,25 @@ void *ActJdLoop(void *arg)
 		CurMat = capImags();
 		times++;
 		judVal = JudegeAct(PreMat,CurMat,TempMat);	//判断图片是否变形
-		localTimeExc(&usertimes);
 		if(judVal == HUMAN){
+			localTimeExc(&usertimes);
+			concatData(Namesave,usertimes,times);
+			imwrite(Namesave,CurMat);
+			cout<<Namesave<<endl;
 			cap_printf("times=%d judVal = HUMAN\r\n",times);
 		}else if(judVal == LIGHT_OFF ){
+			localTimeExc(&usertimes);
+			concatData(Namesave,usertimes,times);
+			imwrite(Namesave,CurMat);
+			cout<<Namesave<<endl;
 			cap_printf("times=%d judVal = LIGHT_OFF\r\n",times);
 		}else if(judVal == LIGHT_ON ){
+			localTimeExc(&usertimes);
+			concatData(Namesave,usertimes,times);
+			imwrite(Namesave,CurMat);
+			cout<<Namesave<<endl;
 			cap_printf("times=%d judVal = LIGHT_ON\r\n",times);
 		}else{
-			concatData(Namesave,usertimes,times);
-			cout<<Namesave<<endl;
 			cap_printf("times=%d judVal = NOTHING\r\n",times);
 		}
 		CurMat.copyTo(PreMat);

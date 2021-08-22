@@ -29,16 +29,8 @@ void *loopControl(void* arg)
 	//获取当地经纬度  判断这个区域的温度
 	bool   action=0;
 	double tempDS18B20;
-#if	0
-	time_t timep;
-	struct tm *usertimes;
-	time (&timep);
-	usertimes = localtime(&timep);
-#else
 	struct tm *usertimes;
 	localTimeExc(&usertimes);
-#endif
-	
 	loop_printf("usertimes.min = %d\r\n",usertimes->tm_min);
 	loop_printf("usertimes.hour = %d\r\n",usertimes->tm_hour);
 	loop_printf("usertimes.day = %d\r\n",usertimes->tm_mday);
@@ -48,14 +40,10 @@ void *loopControl(void* arg)
 	loop_printf("%s",asctime(usertimes));
 	cout<<exec("pwd")<<endl;
 	while(1){
-#if	0
-		time (&timep);
-		usertimes = localtime(&timep);
-#else
 		localTimeExc(&usertimes);
-#endif
 		if(usertimes->tm_wday<5){	//周末我要睡懒觉  不关空调
-			if(usertimes->tm_hour>7 && usertimes->tm_hour<18){//早上七点后 下午6点前 关空调
+#if	0
+			if(usertimes->tm_hour>10 && usertimes->tm_hour<16){//早上10点后 下午4点前 关空调 周末还是得出去走走
 				MulOpenTimes("../data/close.bin",REPET_TIMES);
 				loop_printf("usertimes.min = %d\r\n",usertimes->tm_min);
 				loop_printf("usertimes.hour = %d\r\n",usertimes->tm_hour);
@@ -63,11 +51,15 @@ void *loopControl(void* arg)
 				loop_printf("usertimes.mon = %d\r\n",usertimes->tm_mon);
 				loop_printf("usertimes.year = %d\r\n",usertimes->tm_year);
 				loop_printf("usertimes.wday = %d\r\n",usertimes->tm_wday);
-				return NULL;
+				while(usertimes->tm_hour>10 && usertimes->tm_hour<16){
+					sleep(600);	//每10分钟监测一次时间
+					localTimeExc(&usertimes);
+				}
 			}
+#endif
 		}
-		tempDS18B20 = tempCaculate();	//获取温度  让温度处于 29~32区间
-		if(tempDS18B20<0){	//温度获取异常CRC异常
+		tempDS18B20 = AveTempGet();	//获取温度  让温度处于 29~32区间
+		if(tempDS18B20<=0){	//温度获取异常CRC异常
 			continue;
 		}
 		//判断季节 经纬度	//没钱买
@@ -79,17 +71,22 @@ void *loopControl(void* arg)
 		}else if(usertimes->tm_mon>=5 && usertimes->tm_mon<=7){	// summer 夏季
 			if(tempDS18B20 > 36){
 				if(usertimes->tm_mon==5){
+					cout<<tempDS18B20<<endl;
 					MulOpenTimes("../data/open_cold27.bin",REPET_TIMES); //夏季前两个月 27度
 					action ^= 1;
 				}else if(usertimes->tm_mon==6){
+					cout<<tempDS18B20<<endl;
 					MulOpenTimes("../data/open_cold28.bin",REPET_TIMES); //夏季前两个月 27度
 					action ^= 1;
 				}else{
+					cout<<tempDS18B20<<endl;
 					MulOpenTimes("../data/open_cold28.bin",REPET_TIMES); //夏季前两个月 27度
 					action ^= 1;
 				}
 				LogTimeWriteFile("../data/log.txt",usertimes,"Temp>34",tempDS18B20);
 			}else if(tempDS18B20 < 30){
+				cout<<usertimes<<endl;
+				cout<<tempDS18B20<<endl;
 				MulOpenTimes("../data/close.bin",REPET_TIMES);
 				LogTimeWriteFile("../data/log.txt",usertimes,"Temp<30",tempDS18B20);
 				action ^= 1;
