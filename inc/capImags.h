@@ -5,10 +5,10 @@
 #include <opencv2/opencv.hpp>
 #include <unistd.h>
 
-#define NOTHING		0x00
+#define NOTHING		0x80
 #define HUMAN 		0x01
 #define LIGHT_OFF 	0x02
-#define LIGHT_ON  	0x03
+#define LIGHT_ON  	0x04
 
 #define P_WIDTH		640
 #define P_HEIGHT	480
@@ -35,5 +35,7 @@ void FixImags(Mat inMat,Mat &outMat,int val);
 int JudgeAct(Mat PreMat,Mat AftMat,Mat &outMat);
 static void concatData(string &out,struct tm *usertimes,int times);
 void *ActJdLoop(void *arg);
-
+int GetLight(Mat inMat);		//计算亮度
+int GetDiffVal(Mat inMat,int aveLight);	//获取对比度	//均方差
+int FoundRectPoints(Mat inMat,Mat &outMat,vector<Rect> &vRts,Point start,Point end);
 #endif

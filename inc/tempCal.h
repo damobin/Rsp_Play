@@ -19,7 +19,7 @@
 #endif
 
 #define TEMP_PIN	8 //GPIO 2
-#define INIT_DELAY_TIME_US	480+20 
+#define INIT_DELAY_TIME_US	(480+200)
 
 // 函数声明
 uint8_t CRC8_Table(vector<uint8_t> src,int insize);

@@ -28,6 +28,7 @@ void *loopControl(void* arg)
 	//判断现在的季节  春 - 夏 - 秋 - 冬
 	//获取当地经纬度  判断这个区域的温度
 	bool   action=0;
+	uint16_t AIR_STATUS=AIR_OFF;
 	double tempDS18B20;
 	struct tm *usertimes;
 	localTimeExc(&usertimes);
@@ -42,9 +43,10 @@ void *loopControl(void* arg)
 	while(1){
 		localTimeExc(&usertimes);
 		if(usertimes->tm_wday<5){	//周末我要睡懒觉  不关空调
-#if	0
+#if	1
 			if(usertimes->tm_hour>10 && usertimes->tm_hour<16){//早上10点后 下午4点前 关空调 周末还是得出去走走
 				MulOpenTimes("../data/close.bin",REPET_TIMES);
+				AIR_STATUS=AIR_OFF;
 				loop_printf("usertimes.min = %d\r\n",usertimes->tm_min);
 				loop_printf("usertimes.hour = %d\r\n",usertimes->tm_hour);
 				loop_printf("usertimes.day = %d\r\n",usertimes->tm_mday);
@@ -72,24 +74,36 @@ void *loopControl(void* arg)
 			if(tempDS18B20 > 36){
 				if(usertimes->tm_mon==5){
 					cout<<tempDS18B20<<endl;
-					MulOpenTimes("../data/open_cold27.bin",REPET_TIMES); //夏季前两个月 27度
-					action ^= 1;
+					if((AIR_STATUS & (AIR_ON|AIR_COLD) ) != (AIR_ON|AIR_COLD)){
+						AIR_STATUS |= (AIR_ON|AIR_COLD);
+						MulOpenTimes("../data/open_cold27.bin",REPET_TIMES); //夏季前两个月 27度
+						action ^= 1;
+					}
 				}else if(usertimes->tm_mon==6){
 					cout<<tempDS18B20<<endl;
-					MulOpenTimes("../data/open_cold28.bin",REPET_TIMES); //夏季前两个月 27度
-					action ^= 1;
+					if((AIR_STATUS & (AIR_ON|AIR_COLD) ) != (AIR_ON|AIR_COLD)){
+						AIR_STATUS |= (AIR_ON|AIR_COLD);
+						MulOpenTimes("../data/open_cold28.bin",REPET_TIMES); //夏季前两个月 27度
+						action ^= 1;
+					}
 				}else{
 					cout<<tempDS18B20<<endl;
-					MulOpenTimes("../data/open_cold28.bin",REPET_TIMES); //夏季前两个月 27度
-					action ^= 1;
+					if((AIR_STATUS & (AIR_ON|AIR_COLD) ) != (AIR_ON|AIR_COLD)){
+						AIR_STATUS |= (AIR_ON|AIR_COLD);
+						MulOpenTimes("../data/open_cold28.bin",REPET_TIMES); //夏季前两个月 27度
+						action ^= 1;
+					}
 				}
 				LogTimeWriteFile("../data/log.txt",usertimes,"Temp>34",tempDS18B20);
 			}else if(tempDS18B20 < 30){
 				cout<<usertimes<<endl;
 				cout<<tempDS18B20<<endl;
-				MulOpenTimes("../data/close.bin",REPET_TIMES);
-				LogTimeWriteFile("../data/log.txt",usertimes,"Temp<30",tempDS18B20);
-				action ^= 1;
+				if((AIR_STATUS & (AIR_ON|AIR_COLD) ) == (AIR_ON|AIR_COLD)){
+					AIR_STATUS = AIR_OFF;
+					MulOpenTimes("../data/close.bin",REPET_TIMES);
+					LogTimeWriteFile("../data/log.txt",usertimes,"Temp<30",tempDS18B20);
+					action ^= 1;
+				}
 			}else{
 			}
 		}else if(usertimes->tm_mon>=8 && usertimes->tm_mon<=10){	//autumn  秋季
@@ -98,7 +112,7 @@ void *loopControl(void* arg)
 						
 		}
 
-		loop_printf("temp=%lf\r\n",tempDS18B20);
+		loop_printf("temp=%lf AIR_statu=%04x\r\n",tempDS18B20,AIR_STATUS);
 		sleep(10);
 		if(action==1){		//完成开机 或者 关机 需要等待 1min后再次观测
 			sleep(60);	

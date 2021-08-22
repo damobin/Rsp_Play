@@ -1,6 +1,7 @@
 define set_args
-	set args "" "../data/test.bin"
-	b main
+#	set args "" "../data/test.bin"
+	set args "loopct"
+	b capImags.cc:FoundRectPoints
 	r
 end
 
